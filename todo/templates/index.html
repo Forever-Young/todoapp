@@ -23,14 +23,14 @@
                 <th class='text-center'>Description</th>
                 <th style='width: 10%' class='text-center button'>
                     Priority
-                    <a data-bind="attr: { title: prio_sort() == 0 ? 'Unsorted' : (prio_sort() == 1 ? 'Sorted ascending' : 'Sorted descending' ) }, click: togglePrioSort">
-                        <span class="glyphicon" data-bind="css: { 'glyphicon-sort': prio_sort() == 0, 'glyphicon-sort-by-alphabet': prio_sort() == 1, 'glyphicon-sort-by-alphabet-alt': prio_sort() == 2 }"></span>
+                    <a data-bind="attr: { title: prio_sort() == 0 ? 'Unsorted' : (prio_sort() == 1 ? 'Sorted ascending': 'Sorted descending' ) }, click: togglePrioSort">
+                        <span class="glyphicon" data-bind="css: { 'glyphicon-sort': prio_sort() == 0, 'glyphicon-sort-by-attributes': prio_sort() == 1, 'glyphicon-sort-by-attributes-alt': prio_sort() == 2 }"></span>
                     </a>
                 </th>
                 <th style='width: 15%' class='text-center button'>
                     Due date
                     <a data-bind="attr: { title: due_sort() == 0 ? 'Unsorted' : (due_sort() == 1 ? 'Sorted ascending' : 'Sorted descending' ) }, click: toggleDueSort">
-                        <span class="glyphicon" data-bind="css: { 'glyphicon-sort': due_sort() == 0, 'glyphicon-sort-by-order': due_sort() == 1, 'glyphicon-sort-by-order-alt': due_sort() == 2 }"></span>
+                        <span class="glyphicon" data-bind="css: { 'glyphicon-sort': due_sort() == 0, 'glyphicon-sort-by-attributes': due_sort() == 1, 'glyphicon-sort-by-attributes-alt': due_sort() == 2 }"></span>
                     </a>
                 </th>
             </tr>
