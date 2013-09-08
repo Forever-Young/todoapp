@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% block title %}ToDo - Help{% endblock %}
+{% block menu %}
+    {% include "include_menu.html" with active_tab='help' %}
+{% endblock %}
+{% block content %}
+    <h3>RESTful service</h3>
+    <p>Your API key is '{{ apikey }}'</p>.
+{% endblock %}
