@@ -8,6 +8,9 @@
     {% if user.is_authenticated %}
         <span class='pull-left label label-danger' data-bind='text: error, visible: error()'></span>
         <div class='text-right add-button'>
+            <span class='form-inline'>
+                <input type="text" class="form-control" placeholder="Filter" style='width: 15%' data-bind='value: filter_str, valueUpdate: "afterkeydown"'>
+            </span>
             <button class="btn btn-small" data-bind='css: { "active": show_completed() }, click: toggleShowCompleted'>
                 <span class="glyphicon" data-bind='css: { "glyphicon-ok-circle": show_completed(), "glyphicon-ban-circle": !show_completed() }'></span>
                 <span data-bind='text: show_completed() ? "Show completed" : "Hide completed"'></span>
@@ -101,9 +104,12 @@
                 blockUI();
                 var offset = ITEMS_PER_PAGE * (viewModel.pager.page() - 1);
                 var completed = '';
+                var filter_param = '';
+                if(viewModel.filter_str())
+                    filter_param = '&text__contains=' + viewModel.filter_str();
                 if(!viewModel.show_completed())
                     completed = '&completed__exact=false';
-                $.getJSON('{% url "api_dispatch_list" "v1" "todo"  %}?format=json&limit=' + ITEMS_PER_PAGE + '&offset=' + offset + sorting + completed, function(data) {
+                $.getJSON('{% url "api_dispatch_list" "v1" "todo"  %}?format=json&limit=' + ITEMS_PER_PAGE + '&offset=' + offset + sorting + completed + filter_param, function(data) {
                     var total_count = data.meta.total_count;
                     data = { todolist: data.objects };
                     var i, len = data.todolist.length;
@@ -264,6 +270,10 @@
                         updateList();
                     }
                 };
+                viewModel.filter_str = ko.observable('');
+                viewModel.filter_str.subscribe(function(){
+                    updateList();
+                });
                 ko.applyBindings(viewModel);
 
                 window.onbeforeunload = function() {
