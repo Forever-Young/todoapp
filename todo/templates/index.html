@@ -315,8 +315,11 @@
                         }
                     },
                     contentType: "application/json; charset=utf-8",
-                    error: function() {
-                        viewModel.error('Error communicating with server');
+                    error: function(data) {
+                        if(data.responseJSON && data.responseJSON.error && data.responseJSON.error[0].indexOf('invalid date format') != -1)
+                            viewModel.error('Invalid date format. It must be in YYYY-MM-DD format.');
+                        else
+                            viewModel.error('Error communicating with server');
                         setTimeout(function() {viewModel.error('');}, 3000);
                     }
                 });
