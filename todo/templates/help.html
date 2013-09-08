@@ -1,10 +1,32 @@
 {% extends "base.html" %}
-{% load static from staticfiles %}
 {% block title %}ToDo - Help{% endblock %}
 {% block menu %}
     {% include "include_menu.html" with active_tab='help' %}
 {% endblock %}
 {% block content %}
     <h3>RESTful service</h3>
-    <p>Your API key is '{{ apikey }}'</p>.
+    <p>Your API key is <code>{{ apikey }}</code></p>
+    <p>You can pass it as URL parameter: <code>&username={{ user.username }}&api_key={{ apikey }}</code></p>
+    <p>or as request header:<code>Authorization: ApiKey {{ user.username }}:{{ apikey }}</code></p>
+    <p>Fields:</p>
+    <ul>
+        <li><em>text</em> - description of ToDo item</li>
+        <li><em>completed</em> - whether item is completed</li>
+        <li><em>due</em> - due date</li>
+        <li><em>priority</em> - priority (A-Z)</li>
+    </ul>
+    <p>Urls:</p>
+    <ul>
+        <li>Get ToDo items list: <code>GET on <a href='http://{{ site.domain }}{% url "api_dispatch_list" "v1" "todo" %}?format=json'>http://{{ site.domain }}{% url "api_dispatch_list" "v1" "todo" %}?format=json</a></code></li>
+        <li>Get ToDo item: <code>GET on <a href='http://{{ site.domain }}{% url "api_dispatch_detail" "v1" "todo" "ID" %}?format=json'>http://{{ site.domain }}{% url "api_dispatch_detail" "v1" "todo" "ID" %}?format=json</a></code></li>
+        <li>Change ToDo item: <code>PUT on <a href='http://{{ site.domain }}{% url "api_dispatch_detail" "v1" "todo" "ID" %}?format=json'>http://{{ site.domain }}{% url "api_dispatch_detail" "v1" "todo" "ID" %}?format=json</a></code></li>
+        <li>Create ToDo item: <code>POST on <a href='http://{{ site.domain }}{% url "api_dispatch_list" "v1" "todo" %}?format=json'>http://{{ site.domain }}{% url "api_dispatch_list" "v1" "todo" %}?format=json</a></code></li>
+        <li>Delete ToDo item: <code>DELETE on <a href='http://{{ site.domain }}{% url "api_dispatch_detail" "v1" "todo" "ID" %}?format=json'>http://{{ site.domain }}{% url "api_dispatch_detail" "v1" "todo" "ID" %}?format=json</a></code></li>
+    </ul>
+    <p>For change and create urls, request should pass JSON-dict with item fields, e.g. <code>{ completed: true }</code></p>
+    <p>Additional URL parameters:</p>
+    <ul>
+        <li>Filtering: <code>&text__contains=STR&completed__exact=true</code></li>
+        <li>Ordering: <code>&order_by=due&order_by=priority</code></li>
+    </ul>
 {% endblock %}
