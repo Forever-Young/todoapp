@@ -6,6 +6,7 @@
 {% endblock %}
 {% block content %}
     {% if user.is_authenticated %}
+        <span class='pull-left label label-danger' data-bind='text: error, visible: error()'></span>
         <div class='text-right add-button'>
             <button type='button' class='btn' data-bind="click: addTodo, enable: !edition()">Add</button>
         </div>
@@ -190,6 +191,7 @@
                 viewModel.availablePriorities = ko.observableArray({{ available_priorities|safe }});
                 viewModel.due_sort = ko.observable(0);
                 viewModel.prio_sort = ko.observable(0);
+                viewModel.error = ko.observable('');
                 ko.applyBindings(viewModel);
 
                 var csrftoken = $.cookie('csrftoken');
@@ -220,6 +222,10 @@
                         }
                     },
                     contentType: "application/json; charset=utf-8",
+                    error: function() {
+                        viewModel.error('Error communicating with server');
+                        setTimeout(function() {viewModel.error('');}, 3000);
+                    },
                 });
                 $(document).ajaxStop($.unblockUI);
             });
