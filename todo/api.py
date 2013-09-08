@@ -1,3 +1,4 @@
+from tastypie.constants import ALL
 from tastypie.resources import ModelResource
 from tastypie.authentication import MultiAuthentication, ApiKeyAuthentication, SessionAuthentication
 from .authorization import UserObjectsOnlyAuthorization
@@ -16,6 +17,7 @@ class TodoItemResource(ModelResource):
         resource_name = 'todo'
         excludes = ['user']
         ordering = ['due', 'priority']
+        filtering = {'completed': ALL, 'text': ALL}
         authentication = MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication())
         authorization = UserObjectsOnlyAuthorization()
 

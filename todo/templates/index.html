@@ -32,7 +32,7 @@
                 </th>
             </tr>
             <tbody data-bind="foreach: todolist">
-                <tr data-bind="css: { 'task-completed': completed(), 'overdue': due() < $.datepicker.formatDate('yy-mm-dd', new Date()) }, visible: !editable() && (!completed() || $parent.show_completed()), attr: { title: due() < $.datepicker.formatDate('yy-mm-dd', new Date()) ? 'Overdue!' : '' }">
+                <tr data-bind="css: { 'task-completed': completed(), 'overdue': due() < $.datepicker.formatDate('yy-mm-dd', new Date()) }, visible: !editable(), attr: { title: due() < $.datepicker.formatDate('yy-mm-dd', new Date()) ? 'Overdue!' : '' }">
                     <td class="button">
                         <a data-bind="attr: { title: completed() ? 'Uncheck' : 'Check' }, click: toggleTodo"><span class="glyphicon" data-bind="css: { 'glyphicon-check': completed(), 'glyphicon-unchecked': completed() == false }"></span></a>
                         <a title="Edit" data-bind="click: editTodo"><span class="glyphicon glyphicon-edit"></span></a>
@@ -50,6 +50,13 @@
                 </tr>
             </tbody>
         </table>
+        <ul class="pager" data-bind='visible: pager.total_pages() > 1'>
+            <li><a data-bind="click: pager.first">First</a></li>
+            <li><a data-bind="click: pager.prev">Prev</a></li>
+            <li data-bind="text: pager.page() + '/' + pager.total_pages()"></li>
+            <li><a data-bind="click: pager.next">Next</a></li>
+            <li><a data-bind="click: pager.last">Last</a></li>
+        </ul>
     {% else %}
         <h1>Welcome!</h1>
         <p>You need to <a href="{% url "registration_register" %}">sign up</a> for this service, to maintain your ToDo list.</p>
@@ -67,6 +74,7 @@
         <script src="{% static 'js/jquery.cookie.js' %}"></script>
         <script src="{% static 'js/jquery-ui-1.10.3.custom.min.js' %}"></script>
         <script>
+            var ITEMS_PER_PAGE = {{ items_per_page }};
             // from http://lions-mark.com/jquery/scrollTo/
             $.fn.scrollTo = function( target, options, callback ){
               if(typeof options == 'function' && arguments.length == 2){ callback = options; options = target; }
@@ -91,7 +99,12 @@
             }
             function updateList() {
                 blockUI();
-                $.getJSON('{% url "api_dispatch_list" "v1" "todo"  %}?format=json' + sorting, function(data) {
+                var offset = ITEMS_PER_PAGE * (viewModel.pager.page() - 1);
+                var completed = '';
+                if(!viewModel.show_completed())
+                    completed = '&completed__exact=false';
+                $.getJSON('{% url "api_dispatch_list" "v1" "todo"  %}?format=json&limit=' + ITEMS_PER_PAGE + '&offset=' + offset + sorting + completed, function(data) {
+                    var total_count = data.meta.total_count;
                     data = { todolist: data.objects };
                     var i, len = data.todolist.length;
                     for(i = 0; i < len; i++) {
@@ -99,6 +112,11 @@
                     }
                     data.edition = ko.observable(false);
                     ko.mapping.fromJS(data, viewModel);
+                    viewModel.pager.total_pages(Math.ceil(total_count / ITEMS_PER_PAGE));
+                    if(viewModel.pager.page() > viewModel.pager.total_pages()) {
+                        viewModel.pager.page(viewModel.pager.total_pages());
+                        updateList();
+                    }
                 });
             }
             function toggleTodo() {
@@ -166,7 +184,7 @@
                     cache: false,
                     data: ko.toJSON(object),
                     success: function() {
-                        updateList(); {# update whole list because of possibly changed sorting #}
+                        updateList();
                     }
                 });
             }
@@ -199,6 +217,7 @@
             }
             function toggleShowCompleted() {
                 viewModel.show_completed(!viewModel.show_completed());
+                updateList();
             }
 
             var viewModel;
@@ -217,6 +236,34 @@
                 viewModel.prio_sort = ko.observable(0);
                 viewModel.error = ko.observable('');
                 viewModel.show_completed = ko.observable(true);
+                viewModel.pager = {
+                    page: ko.observable(1),
+                    total_pages: ko.observable({{ max_pages }}),
+                    prev: function() {
+                        var cur = viewModel.pager.page();
+                        cur -= 1;
+                        if(cur != 0) {
+                            viewModel.pager.page(cur);
+                            updateList();
+                        }
+                    },
+                    next: function() {
+                        var cur = viewModel.pager.page();
+                        cur += 1;
+                        if(cur != viewModel.pager.total_pages() + 1) {
+                            viewModel.pager.page(cur);
+                            updateList();
+                        }
+                    },
+                    first: function() {
+                        viewModel.pager.page(1);
+                        updateList();
+                    },
+                    last: function() {
+                        viewModel.pager.page(viewModel.pager.total_pages());
+                        updateList();
+                    }
+                };
                 ko.applyBindings(viewModel);
 
                 window.onbeforeunload = function() {

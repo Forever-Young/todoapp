@@ -61,3 +61,7 @@ code {
 tr.overdue > td:last-child {
     color: red;
 }
+
+ul.pager > li > a {
+    cursor: pointer;
+}
