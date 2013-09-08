@@ -24,7 +24,7 @@ def _dumpjson(data):
 
 def get_todolist(request):
     if not request.user.is_authenticated():
-        return None
+        return None, 0
     queryset = TodoItem.objects.filter(user=request.user)
     length = int(math.ceil(len(queryset) / float(settings.PAGINATOR_ITEMS_PER_PAGE)))
     return _dumpjson(list(queryset.values())[:settings.PAGINATOR_ITEMS_PER_PAGE]), length

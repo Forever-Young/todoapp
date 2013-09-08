@@ -103,6 +103,8 @@
             function updateList() {
                 blockUI();
                 var offset = ITEMS_PER_PAGE * (viewModel.pager.page() - 1);
+                if(offset < 0)
+                    offset = 0;
                 var completed = '';
                 var filter_param = '';
                 if(viewModel.filter_str())
