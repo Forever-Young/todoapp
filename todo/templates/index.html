@@ -8,6 +8,10 @@
     {% if user.is_authenticated %}
         <span class='pull-left label label-danger' data-bind='text: error, visible: error()'></span>
         <div class='text-right add-button'>
+            <button class="btn btn-small" data-bind='css: { "active": show_completed() }, click: toggleShowCompleted'>
+                <span class="glyphicon" data-bind='css: { "glyphicon-ok-circle": show_completed(), "glyphicon-ban-circle": !show_completed() }'></span>
+                <span data-bind='text: show_completed() ? "Show completed" : "Hide completed"'></span>
+            </button>
             <button type='button' class='btn' data-bind="click: addTodo, enable: !edition()">Add</button>
         </div>
         <table class='table table-hover' id="todolist">
@@ -28,7 +32,7 @@
                 </th>
             </tr>
             <tbody data-bind="foreach: todolist">
-                <tr data-bind="css: { 'task-completed': completed(), 'overdue': due() < $.datepicker.formatDate('yy-mm-dd', new Date()) }, visible: !editable(), attr: { title: due() < $.datepicker.formatDate('yy-mm-dd', new Date()) ? 'Overdue!' : '' }">
+                <tr data-bind="css: { 'task-completed': completed(), 'overdue': due() < $.datepicker.formatDate('yy-mm-dd', new Date()) }, visible: !editable() && (!completed() || $parent.show_completed()), attr: { title: due() < $.datepicker.formatDate('yy-mm-dd', new Date()) ? 'Overdue!' : '' }">
                     <td class="button">
                         <a data-bind="attr: { title: completed() ? 'Uncheck' : 'Check' }, click: toggleTodo"><span class="glyphicon" data-bind="css: { 'glyphicon-check': completed(), 'glyphicon-unchecked': completed() == false }"></span></a>
                         <a title="Edit" data-bind="click: editTodo"><span class="glyphicon glyphicon-edit"></span></a>
@@ -38,13 +42,11 @@
                     <td data-bind="text: priority" class='text-center'></td>
                     <td data-bind="text: due" class='text-center'></td>
                 </tr>
-                <tr data-bind="visible: editable()">
-                    <form class="form-inline">
-                        <td><button type="button" class="btn btn-default btn-sm" data-bind='click: doneEdit'>Done</button></td>
-                        <td><input data-bind="value: text" class="form-control" /></td>
-                        <td><select data-bind="value: priority, options: $parent.availablePriorities" class="form-control"></select></td>
-                        <td><input data-bind="value: due" class="form-control datefield" /></td>
-                    </form>
+                <tr data-bind="visible: editable()" class='form-inline'>
+                    <td><button type="button" class="btn btn-default btn-sm" data-bind='click: doneEdit'>Done</button></td>
+                    <td><input data-bind="value: text" class="form-control" /></td>
+                    <td><select data-bind="value: priority, options: $parent.availablePriorities" class="form-control"></select></td>
+                    <td><input data-bind="value: due" class="form-control datefield" /></td>
                 </tr>
             </tbody>
         </table>
@@ -82,10 +84,10 @@
                   if (typeof callback == 'function') { callback.call(this); }
                 });
               });
-            }
+            };
 
             function blockUI() {
-                $.blockUI({ message: '<img src="{% static 'img/ajax-loader.gif' %}" />Please wait...', bindEvents: false, });
+                $.blockUI({ message: '<img src="{% static 'img/ajax-loader.gif' %}" />Please wait...', bindEvents: false });
             }
             function updateList() {
                 blockUI();
@@ -131,7 +133,7 @@
                     due: ko.observable(''),
                     completed: ko.observable(false),
                     priority: ko.observable(''),
-                    editable: ko.observable(true),
+                    editable: ko.observable(true)
                 });
                 viewModel.edition(true);
                 $(".datefield").datepicker({ dateFormat: "yy-mm-dd" });
@@ -195,6 +197,9 @@
                 sorting = '&order_by=' + sorting_array.join('&order_by=');
                 updateList();
             }
+            function toggleShowCompleted() {
+                viewModel.show_completed(!viewModel.show_completed());
+            }
 
             var viewModel;
             var sorting = '';
@@ -211,6 +216,7 @@
                 viewModel.due_sort = ko.observable(0);
                 viewModel.prio_sort = ko.observable(0);
                 viewModel.error = ko.observable('');
+                viewModel.show_completed = ko.observable(true);
                 ko.applyBindings(viewModel);
 
                 var csrftoken = $.cookie('csrftoken');
@@ -244,7 +250,7 @@
                     error: function() {
                         viewModel.error('Error communicating with server');
                         setTimeout(function() {viewModel.error('');}, 3000);
-                    },
+                    }
                 });
                 $(document).ajaxStop($.unblockUI);
             });
