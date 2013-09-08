@@ -65,6 +65,25 @@
         <script src="{% static 'js/jquery.cookie.js' %}"></script>
         <script src="{% static 'js/jquery-ui-1.10.3.custom.min.js' %}"></script>
         <script>
+            // from http://lions-mark.com/jquery/scrollTo/
+            $.fn.scrollTo = function( target, options, callback ){
+              if(typeof options == 'function' && arguments.length == 2){ callback = options; options = target; }
+              var settings = $.extend({
+                scrollTarget  : target,
+                offsetTop     : 50,
+                duration      : 500,
+                easing        : 'swing'
+              }, options);
+              return this.each(function(){
+                var scrollPane = $(this);
+                var scrollTarget = (typeof settings.scrollTarget == "number") ? settings.scrollTarget : $(settings.scrollTarget);
+                var scrollY = (typeof scrollTarget == "number") ? scrollTarget : scrollTarget.offset().top + scrollPane.scrollTop() - parseInt(settings.offsetTop);
+                scrollPane.animate({scrollTop : scrollY }, parseInt(settings.duration), settings.easing, function(){
+                  if (typeof callback == 'function') { callback.call(this); }
+                });
+              });
+            }
+
             function blockUI() {
                 $.blockUI({ message: '<img src="{% static 'img/ajax-loader.gif' %}" />Please wait...', bindEvents: false, });
             }
@@ -113,10 +132,10 @@
                     completed: ko.observable(false),
                     priority: ko.observable(''),
                     editable: ko.observable(true),
-                })
+                });
                 viewModel.edition(true);
                 $(".datefield").datepicker({ dateFormat: "yy-mm-dd" });
-                // TODO: scrollTo!!!
+                $('html').scrollTo($("input.datefield:visible").parent().parent());
             }
             function editTodo() {
                 if(viewModel.edition()) return;
