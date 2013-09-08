@@ -170,3 +170,8 @@ from django.conf import settings
 TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + ('todo.context_processors.site',)
 
 PAGINATOR_ITEMS_PER_PAGE = 7
+
+try:
+    from settings_local import *
+except ImportError:
+    pass
