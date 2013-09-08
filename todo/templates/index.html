@@ -215,12 +215,15 @@
                 if(field == viewModel.prio_sort)
                     name = 'priority';
                 if(new_s == 0)
-                    sorting_array.splice(sorting_array.indexOf(name), 1);
+                    sorting_array.splice(sorting_array.indexOf("-" + name), 1);
                 if(new_s == 1)
                     sorting_array.push(name);
                 if(new_s == 2)
                     sorting_array.splice(sorting_array.indexOf(name), 1, "-" + name);
-                sorting = '&order_by=' + sorting_array.join('&order_by=');
+                if(sorting_array.length > 0)
+                    sorting = '&order_by=' + sorting_array.join('&order_by=');
+                else
+                    sorting = '';
                 updateList();
             }
             function toggleShowCompleted() {
