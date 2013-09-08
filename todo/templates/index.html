@@ -219,6 +219,12 @@
                 viewModel.show_completed = ko.observable(true);
                 ko.applyBindings(viewModel);
 
+                window.onbeforeunload = function() {
+                    if(viewModel.edition()) {
+                        return "You have started editing ToDo item."
+                    }
+                }
+
                 var csrftoken = $.cookie('csrftoken');
                 function csrfSafeMethod(method) {
                     // these HTTP methods do not require CSRF protection
