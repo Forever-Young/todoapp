@@ -1,4 +1,4 @@
-Django==1.10
+Django==1.10.1
 South==1.0.2
 django-bootstrap-form==3.2.1
 git+git://github.com/fnstudio/django-registration.git@0c7d2d1fe93cae770e641e64b4ce6383aded8927
