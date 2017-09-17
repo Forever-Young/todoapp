@@ -5,5 +5,5 @@ git+git://github.com/fnstudio/django-registration.git@0c7d2d1fe93cae770e641e64b4
 django-tastypie==0.14.0
 mimeparse==0.1.4
 python-dateutil==2.6.1
-six==1.10.0
+six==1.11.0
 wsgiref==0.1.2
