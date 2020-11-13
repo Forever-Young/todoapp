@@ -1,2 +1,2 @@
-requests==2.24.0
+requests==2.25.0
 git+git://github.com/Forever-Young/slumber@8101943809a0032e1ca8177639c780b320713872
